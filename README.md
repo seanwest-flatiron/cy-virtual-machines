@@ -1,4 +1,4 @@
-== Purpose ==
+## Purpose 
 This is an experiment in creating a simple devops pipeline to help the
 continuing development and exporting of the Capstone virtual machines.
 
@@ -13,29 +13,27 @@ This means that:
  - Upgrades (e.g. apt upgrades) can in theory be automated, and even exported 
    to a google drive
 
-= Installation ==
-
+## Requirements
  - Upgrade VirtualBox to the latest version
  - Install Vagrant: https://developer.hashicorp.com/vagrant/install
 
-== Running ==
+## Usage
 
 To fully create and export a VM, cd into it's directory (e.g. pc2) and then run the
-create-export.ps1 script.
+create_and_export.ps1 script.
 
 This will start from a base VM, add every addition, and then export the result to a .ova file
 
 Currently only the router and pc2 have been created.
 
-Although the create-export script has a .ps1 (powershell) extension, it should in theory be able to run
-on mac or linux as it only uses basic shell commands.
+Although the create_and_export.ps1 script has a .ps1 (powershell) extension, it can be run with bash (`bash create_and_export.ps1`) or powershell (`powershell create_and_export.ps1`)
 
 To experiment adding/removing certain aspects of a VM
  - start by looking at the Vagrantfile. This is where all VM changes are made
- - use vagrant commands such as vagrant up (bring a Virtual Machine up), and vagrant provision to detect new changes and implement them.
+ - use vagrant commands such as `vagrant up` (bring a Virtual Machine up), and `vagrant provision` (rerun all additions to a VM)
  - Vagrant is idempotent (safe to run the same command/script multiple times) but the scripts created probably aren't yet. This can be worked on
 
-== Additional Information ==
+## Additional Information
 
 - The goal was to keep this simple, so that it could be easily understood and
   maintained
