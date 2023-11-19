@@ -1,0 +1,78 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "lubuntu-desktop-22.04-guest"
+  config.vm.box_url = "../boxes/lubuntu-desktop-22.04-guest.box"
+
+  # virtualbox specifics
+  config.vm.provider "virtualbox" do |vb|
+    vb.name = "pc2"
+    vb.cpus = 2
+    vb.memory = "2048"
+
+    # Put it in a VirtualBox group
+    vb.customize ["modifyvm", :id, "--groups", "/Capstone"]
+
+    # set the network adapters
+    # vagrant needs one of them to be nat with port forwarding
+    vb.customize ["modifyvm", :id, "--nic1", "intnet", "--intnet1", "intnet-1"]
+    vb.customize ["modifyvm", :id, "--nic2", "nat"]
+    vb.customize ["modifyvm", :id, "--natpf2" , "guestssh,tcp,,21902,,22"]
+  end
+
+  config.vm.hostname = "acmepc1"
+
+  config.vm.provision "shell", inline: <<-SHELL
+    echo '192.168.20.100  intranet' >> /etc/hosts
+    echo '192.168.20.100  intranet.acmecompany.dmz' >> /etc/hosts
+    echo '192.168.10.1  flatironos' >> /etc/hosts
+  SHELL
+
+  # Create ip addresses
+  config.vm.provision "shell", path: "./files/create-ips.sh"
+
+  # Create users
+  config.vm.provision "shell", path: "./files/create-users.sh"
+
+  # pyListener.py
+  config.vm.provision "shell", inline: <<-SHELL
+    mkdir -p ~acme/Documents
+    cp /vagrant/files/pyListener.py ~acme/Documents/
+    chown acme:acme ~acme/Documents/pyListener.py
+    chmod 775 ~acme/Documents/pyListener.py
+    cp /vagrant/files/pyListener.py /bin/
+    chmod u+x /bin/pyListener.py
+  SHELL
+
+  # pyListener.service
+  config.vm.provision "shell", inline: <<-SHELL
+    cp /vagrant/files/pyListener.service /etc/systemd/system/
+    systemctl daemon-reload
+    systemctl start pyListener
+    # the following command complains but still works.
+    # combining with a no-operation so vagrant doesn't freak out
+    systemctl enable pyListener 2>/dev/null || :
+  SHELL
+
+  # only the acme user should be able to graphically login
+  config.vm.provision "shell", path: "./files/acme-login.sh"
+
+  # add custom sudo privileges for user acme
+  config.vm.provision "shell", inline: <<-SHELL
+    echo -e 'acme\tALL=(ALL) NOPASSWD:/usr/sbin/chkrootkit , /usr/bin/find , /usr/bin/netstat , /usr/bin/ss , /usr/bin/cat /etc/shadow' >> /etc/sudoers
+  SHELL
+
+  # setup samba
+  config.vm.provision "shell", inline: "apt update && apt install -y smbclient"
+
+  # upload teardown script to be run outside of Vagrant
+  config.vm.provision "file", source: "./files/teardown.sh", destination: "~/teardown.sh"
+
+  # Allow temporary root ssh access so teardown script can remove vagrant user
+  config.vm.provision "file", source: "../keys/id_rsa.pub", destination: "~/id_rsa.pub"
+  config.vm.provision "shell", inline: <<-SHELL
+    mkdir -p /root/.ssh
+    cp ~vagrant/id_rsa.pub /root/.ssh/authorized_keys
+  SHELL
+end

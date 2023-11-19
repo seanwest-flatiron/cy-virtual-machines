@@ -1,0 +1,5 @@
+/ovas/*
+!/ovas/.gitkeep
+/boxes/*
+!/boxes/.gitkeep
+.vagrant/

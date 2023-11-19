@@ -1,0 +1,53 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+
+  config.vm.box = "vyos/current"
+
+  # virtualbox specifics
+  config.vm.provider "virtualbox" do |vb|
+    vb.name = "router"
+    vb.cpus = 1
+    vb.memory = "1024"
+
+    # Put it in a VirtualBox group
+    vb.customize ["modifyvm", :id, "--groups", "/Capstone"]
+
+    # Modify the default NAT network's MAC address
+    vb.customize ["modifyvm", :id, "--macaddress1", "080027A0C5B0"]
+
+    # Disable automatic installation of VirtualBox Guest Additions
+    vb.check_guest_additions = false
+    vb.functional_vboxsf = false
+  end
+
+  # SSH settings
+  config.ssh.username = "vyos"
+  config.ssh.password = "vyos"
+  config.ssh.insert_key = false
+
+  # Disable rsync (has issues with windows)
+  config.vm.synced_folder '.', '/vagrant', disabled: true
+
+  # Internal networks
+  config.vm.network "private_network", virtualbox__intnet: "intnet-1",
+    mac: "0800279CC315", ip: "192.168.10.1", auto_config: false
+  config.vm.network "private_network", virtualbox__intnet: "intnet-2",
+    mac: "08002776FE1D", ip: "192.168.20.1", auto_config: false
+  config.vm.network "private_network", virtualbox__intnet: "intnet-3",
+    mac: "0800274EED34", ip: "192.168.30.1", auto_config: false
+
+  # Load prebaked vyos settings
+  config.vm.provision "file", source: "./files/settings.conf", destination: "~/settings.conf"
+  config.vm.provision "shell", inline: <<-SHELL
+    #!/bin/vbash
+    source /opt/vyatta/etc/functions/script-template
+    configure
+    load ~vyos/settings.conf
+    commit
+    save
+    exit
+    rm ~vyos/settings.conf
+  SHELL
+end
