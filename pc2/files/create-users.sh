@@ -6,22 +6,22 @@ sudo mkdir ~acme/Documents
 
 sudo useradd -m rhoward -s /bin/bash
 echo 'rhoward:WUPHF.com.whenever.wherever' | sudo chpasswd
-sudo usermod -aG sudo rhoward
+sudo usermod -aG sudo,adm,lpadmin,sambashare rhoward
 
 sudo useradd -m dwallace -s /bin/bash
 echo 'dwallace:RachelTeddyWhistleblower' | sudo chpasswd
-sudo usermod -aG sudo dwallace
+sudo usermod -aG sudo,adm,lpadmin,sambashare dwallace
 
 sudo useradd -m mscott -s /bin/bash
 echo 'mscott:IBoughtACondo0315' | sudo chpasswd
-sudo usermod -aG sudo mscott
+sudo usermod -aG sudo,adm,lpadmin,sambashare mscott
 
 sudo useradd -m tflenderson -s /bin/bash
 echo 'tflenderson:OutOfTheAnnexandOffToCostaRica' | sudo chpasswd
 
 sudo useradd -m scarmichael -s /bin/bash
 echo 'scarmichael:HipHopis4EVA!' | sudo chpasswd
-sudo usermod -aG sudo scarmichael
+sudo usermod -aG sudo,adm,lpadmin,sambashare scarmichael
 
 sudo useradd -m apickles -s /bin/bash
 echo 'apickles:IWishIHadABabySister' | sudo chpasswd
@@ -43,7 +43,7 @@ echo 'msmith:IAmthe"Morty-est"Morty' | sudo chpasswd
 
 sudo useradd -m wcoyote -s /bin/bash
 echo 'wcoyote:DonCoyoteJokisCallbackus' | sudo chpasswd
-sudo usermod -aG sudo wcoyote
+sudo usermod -aG sudo,adm,lpadmin,sambashare wcoyote
 
 sudo useradd -m sgonzales -s /bin/bash
 echo 'sgonzales:HolyFrijolesAndaleArribaArriba' | sudo chpasswd
