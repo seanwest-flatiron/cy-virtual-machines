@@ -17,21 +17,48 @@ This means that:
  - Upgrade VirtualBox to the latest version
  - Install Vagrant: https://developer.hashicorp.com/vagrant/install
 
+## Installation
+As of now you have to be a part of the Flatiron github organization to clone the repo
+
+```
+git clone git@github.com:seanwest-flatiron/cse-capstone.git
+cd cse-capstone
+```
+
+Now add into the `boxes` directory the `lubuntu-desktop-22.04.box`` file from here: https://drive.google.com/file/d/1ahOaw1-tXvmj42sXgL9z-ErIXY8Hm3P-/view?usp=sharing
+
 ## Usage
 
-To fully create and export a VM, cd into it's directory (e.g. pc2) and then run the
-create_and_export.ps1 script.
+To fully create and export a VM, cd into it's directory (e.g. `pc2`) and then run the
+`create_and_export.ps1` script. This can be run with powershell or bash. The resulting .ova file will be in the `ovas` directory
 
-This will start from a base VM, add every addition, and then export the result to a .ova file
+For example
+```bash
+cd pc2
+bash create_and_export.ps1
+```
 
-Currently only the router and pc2 have been created.
+## Development
 
-Although the create_and_export.ps1 script has a .ps1 (powershell) extension, it can be run with bash (`bash create_and_export.ps1`) or powershell (`powershell create_and_export.ps1`)
+```bash
+cd pc2 # or another VM
+# bring up a temporary VM to experiment with
+vagrant up
+# make changes to the Vagrant file
+# if it doesn't need the whole VM to be recreated:
+vagrant provision
+# if it needs the entire VM to be recreated:
+vagrant reload
+```
 
-To experiment adding/removing certain aspects of a VM
- - start by looking at the Vagrantfile. This is where all VM changes are made
- - use vagrant commands such as `vagrant up` (bring a Virtual Machine up), and `vagrant provision` (rerun all additions to a VM)
- - Vagrant is idempotent (safe to run the same command/script multiple times) but the scripts created probably aren't yet. This can be worked on
+If you feel like your changes are good to go, then run the `create_and_export.ps1` script and your ova is good to go
+
+If you want to push your changes up to this repo:
+```bash
+git add .
+git commit -m 'description of changes'
+git push origin main
+```
 
 ## Additional Information
 
@@ -41,7 +68,7 @@ To experiment adding/removing certain aspects of a VM
   to mimic commands that could have been typed in sequentially when manually
 setting up a VM
 - Vagrant has official Vyos and Kali VM base images (called boxes). There is no official Lubuntu
-  Desktop 22.04 image, so a custom one was created and put in the boxes
-folder using this guide: https://www.engineyard.com/blog/building-a-vagrant-box-from-start-to-finish/.
+  Desktop 22.04 image, so a custom one was created to be put into the boxes
+directory using this guide: https://www.engineyard.com/blog/building-a-vagrant-box-from-start-to-finish/.
 
 
