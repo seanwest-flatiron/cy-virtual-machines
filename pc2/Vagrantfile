@@ -2,8 +2,8 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "lubuntu-desktop-22.04-guest"
-  config.vm.box_url = "../boxes/lubuntu-desktop-22.04-guest.box"
+  config.vm.box = "lubuntu-desktop-22.04"
+  config.vm.box_url = "../boxes/lubuntu-desktop-22.04.box"
 
   # virtualbox specifics
   config.vm.provider "virtualbox" do |vb|
