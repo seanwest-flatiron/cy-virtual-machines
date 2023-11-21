@@ -4,10 +4,12 @@ vagrant ssh -c 'sudo apt update && sudo apt upgrade -y'
 vagrant halt
 
 VBoxManage startvm pc2 --type headless
-echo "Waiting 40 seconds for VM to fully boot back up..."
-sleep 20
-echo "20 more seconds..."
-sleep 20
+echo "Waiting 120 seconds for VM to fully boot back up..."
+sleep 40
+echo "80 more seconds..."
+sleep 40
+echo "40 more seconds..."
+sleep 40
 
 ssh -o StrictHostKeyChecking=no -p 21902 -i ../keys/id_rsa root@localhost 'bash ~vagrant/teardown.sh'
 sleep 20
