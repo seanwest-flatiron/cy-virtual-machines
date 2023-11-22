@@ -18,7 +18,6 @@ This means that:
  - Install Vagrant: https://developer.hashicorp.com/vagrant/install
 
 ## Installation
-As of now you have to be a part of the Flatiron github organization to clone the repo
 
 ```
 git clone git@github.com:seanwest-flatiron/cse-capstone.git
