@@ -21,7 +21,7 @@ Vagrant.configure("2") do |config|
     vb.customize ["modifyvm", :id, "--natpf2" , "guestssh,tcp,,21902,,22"]
   end
 
-  config.vm.hostname = "acmepc1"
+  config.vm.hostname = "acmepc2"
 
   config.vm.provision "shell", inline: <<-SHELL
     echo '192.168.20.100  intranet' >> /etc/hosts
@@ -63,8 +63,17 @@ Vagrant.configure("2") do |config|
     echo -e 'acme\tALL=(ALL) NOPASSWD:/usr/sbin/chkrootkit , /usr/bin/find , /usr/bin/netstat , /usr/bin/ss , /usr/bin/cat /etc/shadow' >> /etc/sudoers
   SHELL
 
-  # setup samba
-  config.vm.provision "shell", inline: "apt update && apt install -y smbclient"
+  # here come the apt installs, so do an update once
+  config.vm.provision "shell", inline: "apt update"
+
+  # install standard tools
+  config.vm.provision "shell", inline: "apt install -y curl net-tools vim"
+
+  # install chkrootkit
+  config.vm.provision "shell", inline: "apt install -y chkrootkit"
+
+  # install samba
+  config.vm.provision "shell", inline: "apt install -y smbclient"
 
   # upload teardown script to be run outside of Vagrant
   config.vm.provision "file", source: "./files/teardown.sh", destination: "~/teardown.sh"
