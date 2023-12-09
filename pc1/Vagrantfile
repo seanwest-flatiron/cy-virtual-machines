@@ -1,0 +1,110 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "lubuntu-desktop-22.04"
+  config.vm.box_url = "../boxes/lubuntu-desktop-22.04.box"
+
+  # virtualbox specifics
+  config.vm.provider "virtualbox" do |vb|
+    vb.name = "pc1"
+    vb.cpus = 2
+    vb.memory = "2048"
+
+    # Put it in a VirtualBox group
+    vb.customize ["modifyvm", :id, "--groups", "/Capstone"]
+
+    # set the network adapters
+    # vagrant needs one of them to be nat with port forwarding
+    vb.customize ["modifyvm", :id, "--nic1", "intnet", "--intnet1", "intnet-1"]
+    vb.customize ["modifyvm", :id, "--nic2", "nat"]
+    vb.customize ["modifyvm", :id, "--natpf2" , "guestssh,tcp,,21901,,22"]
+  end
+
+  config.vm.hostname = "acmepc1"
+
+  config.vm.provision "shell", inline: <<-SHELL
+    echo '192.168.20.100  intranet' >> /etc/hosts
+    echo '192.168.20.100  intranet.acmecompany.dmz' >> /etc/hosts
+    echo '192.168.10.1  flatironos' >> /etc/hosts
+  SHELL
+
+  # Create users
+  config.vm.provision "shell", path: "./files/create-users.sh"
+
+  # only the acme user should be able to graphically login
+  config.vm.provision "shell", path: "./files/acme-login.sh"
+
+  # add custom sudo privileges for user acme
+  # this has rkhunter which pc2 doesn't
+  config.vm.provision "shell", inline: <<-SHELL
+    echo -e 'acme\tALL=(ALL) NOPASSWD: /usr/sbin/chkrootkit, /usr/bin/rkhunter, /usr/bin/find, /usr/bin/netstat, /usr/bin/ss, /usr/bin/cat /var/log/rkhunter.log, /usr/bin/cat /etc/shadow' >> /etc/sudoers
+  SHELL
+
+  # add crontabs for amac and triddle
+  config.vm.provision "shell", inline: <<-SHELL
+    cat /vagrant/files/amac.cron | crontab -u amac -
+    cat /vagrant/files/triddle.cron | crontab -u triddle -
+  SHELL
+
+  # clienscript.py
+  config.vm.provision "shell", inline: <<-SHELL
+    cp /vagrant/files/clientscript.py ~amac/
+    chown amac:amac ~amac/clientscript.py
+  SHELL
+
+  # triddle bash history
+  config.vm.provision "shell", inline: <<-SHELL
+    cp /vagrant/files/triddle.bash.history ~triddle/.bash_history
+    chown triddle:triddle ~triddle/.bash_history
+  SHELL
+
+  # triddle uid/gid changes
+  config.vm.provision "shell", inline: <<-SHELL
+    chmod 700 ~triddle
+    # change triddle's uid and gui to 0
+    sed -i 's/^triddle:x:[^:]*:[^:]*:/triddle:x:0:0:/' /etc/passwd
+  SHELL
+
+  # here come the apt installs, so do an update once
+  config.vm.provision "shell", inline: "apt update"
+
+  # install standard tools
+  config.vm.provision "shell", inline: "apt install -y curl net-tools vim"
+
+  # install rkhunter, chkrootkit and net-tools
+  config.vm.provision "shell", inline: "apt install -y rkhunter chkrootkit"
+
+  # install samba server
+  config.vm.provision "shell", inline: "apt install -y samba"
+
+  # configure samba server
+  config.vm.provision "shell", inline: <<-SHELL
+    cat /vagrant/files/smb-add.conf >> /etc/samba/smb.conf
+    # create acmecompany test file
+    systemctl restart smbd
+  SHELL
+
+  # install everything needed to make Diamorphine
+  config.vm.provision "shell", inline: "apt install -y build-essential"
+
+  # Diamorphine rootkit
+  config.vm.provision "shell", inline: <<-SHELL
+    git clone https://github.com/m0nad/Diamorphine ~triddle/Diamorphine
+    make -C ~triddle/Diamorphine
+    insmod ~triddle/Diamorphine/diamorphine.ko
+    kill -63 0
+  SHELL
+
+  # cannot currently change background to green
+
+  # upload teardown script to be run outside of Vagrant
+  config.vm.provision "file", source: "./files/teardown.sh", destination: "~/teardown.sh"
+
+  # Allow temporary root ssh access so teardown script can remove vagrant user
+  config.vm.provision "file", source: "../keys/id_rsa.pub", destination: "~/id_rsa.pub"
+  config.vm.provision "shell", inline: <<-SHELL
+    mkdir -p /root/.ssh
+    cp ~vagrant/id_rsa.pub /root/.ssh/authorized_keys
+  SHELL
+end

