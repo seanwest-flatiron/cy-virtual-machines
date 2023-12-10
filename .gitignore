@@ -3,3 +3,4 @@
 /boxes/*
 !/boxes/.gitkeep
 .vagrant/
+.DS_Store
