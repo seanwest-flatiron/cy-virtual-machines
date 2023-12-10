@@ -12,6 +12,7 @@ echo "40 more seconds..."
 sleep 40
 
 ssh -o StrictHostKeyChecking=no -p 21902 -i ../keys/id_rsa root@localhost 'bash ~vagrant/teardown.sh'
+echo "Waiting 20 seconds before shutting down VM..."
 sleep 20
 
 VBoxManage controlvm pc2 poweroff
