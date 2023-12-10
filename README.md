@@ -1,4 +1,4 @@
-## Purpose 
+## Purpose
 This is an experiment in creating a simple devops pipeline to help the
 continuing development and exporting of the Capstone virtual machines.
 
@@ -10,7 +10,7 @@ This means that:
  - No unintentional .bash_history, files, or logs left behind (which students
    will find)
  - Changes can be quickly added, changed, and removed
- - Upgrades (e.g. apt upgrades) can in theory be automated, and even exported 
+ - Upgrades (e.g. apt upgrades) can in theory be automated, and even exported
    to a google drive
 
 ## Requirements
@@ -22,9 +22,10 @@ This means that:
 ```
 git clone git@github.com:seanwest-flatiron/cse-capstone.git
 cd cse-capstone
+chmod 600 keys/id_rsa
 ```
 
-Now add into the `boxes` directory the `lubuntu-desktop-22.04.box`` file from here: https://drive.google.com/file/d/1ahOaw1-tXvmj42sXgL9z-ErIXY8Hm3P-/view?usp=sharing
+Now add into the `boxes` directory the `lubuntu-desktop-22.04-v2.box`` file from here: https://drive.google.com/drive/folders/12oq-RQBwUPyk75iS9C8c3pCHHlEiEAr9?usp=share_link
 
 ## Usage
 
