@@ -1,0 +1,95 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "kalilinux/rolling"
+
+  # virtualbox specifics
+  config.vm.provider "virtualbox" do |vb|
+    vb.name = "soc"
+    vb.cpus = 2
+    vb.memory = "2048"
+
+    # Put it in a VirtualBox group
+    vb.customize ["modifyvm", :id, "--groups", "/Capstone"]
+
+    # set the network adapters
+    # vagrant needs one of them to be nat with port forwarding
+    vb.customize ["modifyvm", :id, "--nic1", "intnet", "--intnet1", "intnet-3"]
+    vb.customize ["modifyvm", :id, "--nic2", "nat"]
+    vb.customize ["modifyvm", :id, "--natpf2" , "guestssh,tcp,,21904,,22"]
+  end
+
+  config.vm.hostname = "RoadRunner"
+
+  #these look a little wonky but just copying for now
+  config.vm.provision "shell", inline: <<-SHELL
+    echo '192.168.20.100  acmedmz.acmecompany.fis' >> /etc/hosts
+    echo '192.168.20.100  intranet.acmecompany.fis' >> /etc/hosts
+  SHELL
+
+  # Create ip addresses
+  config.vm.provision "shell", path: "./files/create-ips.sh"
+
+  # Create users
+  config.vm.provision "shell", path: "./files/create-users.sh"
+
+  # Bleachbit in root's .bash_history
+  config.vm.provision "shell", inline: <<-SHELL
+    echo bleachbit > /root/.bash_history
+  SHELL
+
+  # not sure the point of pyListener being at Downloads/system
+  # pyListener.py
+  config.vm.provision "shell", inline: <<-SHELL
+    cp /vagrant/files/pyListener.py ~acme/Downloads/system
+    chown acme:acme ~acme/Downloads/system
+    chmod 775 ~acme/Downloads/system
+    cp /vagrant/files/pyListener.py /bin/
+    chown root:root /bin/pyListener.py
+    chmod 744 /bin/pyListener.py
+  SHELL
+
+  # pyListener.service
+  config.vm.provision "shell", inline: <<-SHELL
+    cp /vagrant/files/pyListener.service /etc/systemd/system/
+    systemctl daemon-reload
+    systemctl start pyListener
+    # the following command complains but still works.
+    # combining with a no-operation so vagrant doesn't freak out
+    systemctl enable pyListener 2>/dev/null || :
+  SHELL
+
+  # here come the apt installs, so do an update once
+  config.vm.provision "shell", inline: "apt update"
+
+  # install standard tools
+  config.vm.provision "shell", inline: "apt install -y curl net-tools vim"
+
+  config.vm.provision "shell", inline: "apt install -y apache2 mariadb-server php libapache2-mod-php php-mysql"
+
+  config.vm.provision "shell", inline: <<-SHELL
+    rm -rf /var/www/html
+    tar -xzf /vagrant/files/html.tgz -C /var/www/
+    cp /var/www/html/dev/designs/anvil2k.jpg ~acme/Documents/
+    cp /var/www/html/wordpress/wp-content/uploads/2022/10/sparksAnvil.jpeg ~acme/Pictures/
+    chown acme:acme ~acme/Documents/anvil2k.jpg ~acme/Pictures/sparksAnvil.jpeg
+    mysql < /vagrant/files/db.sql
+    sed -i 's/^Listen 80$/Listen 192.168.20.100:80/' /etc/apache2/ports.conf
+    systemctl restart mariadb
+    systemctl restart apache2
+  SHELL
+
+  # only the acme user should be able to graphically login
+  config.vm.provision "shell", path: "./files/acme-login.sh"
+
+  # upload teardown script to be run outside of Vagrant
+  config.vm.provision "file", source: "./files/teardown.sh", destination: "~/teardown.sh"
+
+  # Allow temporary root ssh access so teardown script can remove vagrant user
+  config.vm.provision "file", source: "../keys/id_rsa.pub", destination: "~/id_rsa.pub"
+  config.vm.provision "shell", inline: <<-SHELL
+    mkdir -p /root/.ssh
+    cp ~vagrant/id_rsa.pub /root/.ssh/authorized_keys
+  SHELL
+end
