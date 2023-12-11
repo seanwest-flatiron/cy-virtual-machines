@@ -23,6 +23,6 @@ VBoxManage modifyvm soc --nic2 null
 VBoxManage modifyvm soc --nic2 none
 
 echo "Exporting to .ova. This may take a while."
-VBoxManage export intranet --output "../ovas/intranet.ova"
+VBoxManage export soc --output "../ovas/soc.ova"
 
 echo "Done!"
