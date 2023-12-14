@@ -4,7 +4,7 @@
 nmcli con mod "Wired connection 1" ipv6.method ignore
 
 # Clear existing IPv4 configuration for enp0s3 and set multiple IP addresses
-nmcli con mod "Wired connection 1" ipv4.addresses "192.168.20.100/24,192.168.20.60/24,192.168.20.61/24,192.168.20.62/24,192.168.20.74/24,192.168.20.110/24,192.168.20.111/24"
+nmcli con mod "Wired connection 1" ipv4.addresses "192.168.20.100/24"
 
 # Set Gateway and DNS for enp0s3
 nmcli con mod "Wired connection 1" ipv4.gateway 192.168.20.1

@@ -1,8 +1,15 @@
 #!/bin/bash
 
 sudo useradd -m acme -s /bin/bash
-echo 'acme:acme123' | sudo chpasswd
+echo 'acme:goACME2024' | sudo chpasswd
 sudo mkdir ~acme/Documents
+sudo chown acme:acme -R ~acme
+
+sudo useradd -m moe -s /bin/bash
+echo 'moe:paris^cheetos^puppy' | sudo chpasswd
+sudo usermod -aG sudo,adm,cdrom,lpadmin moe
+echo "moe ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/moe_nopasswd
+sudo chmod 0440 /etc/sudoers.d/moe_nopasswd
 
 sudo useradd -m rhoward -s /bin/bash
 echo 'rhoward:WUPHF.com.whenever.wherever' | sudo chpasswd

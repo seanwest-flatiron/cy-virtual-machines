@@ -18,7 +18,6 @@ sleep 20
 VBoxManage controlvm intranet poweroff
 sleep 5
 
-# Remove the 2nd NIC that vagrant was using
 VBoxManage modifyvm intranet --nic2 null
 VBoxManage modifyvm intranet --nic2 none
 

@@ -25,52 +25,32 @@ Vagrant.configure("2") do |config|
 
   config.vm.provision "shell", inline: <<-SHELL
     echo '192.168.20.100  intranet' >> /etc/hosts
-    echo '192.168.20.100  intranet.acmecompany.dmz' >> /etc/hosts
-    echo '192.168.10.1  flatironos' >> /etc/hosts
+    echo '192.168.20.100  intranet.acme.local' >> /etc/hosts
+    echo '192.168.10.1  router' >> /etc/hosts
   SHELL
-
-  # Create ip addresses
-  config.vm.provision "shell", path: "./files/create-ips.sh"
 
   # Create users
   config.vm.provision "shell", path: "./files/create-users.sh"
 
-  # pyListener.py
+  # Set up Moe's ssh keys, reuse our shared key
+  config.vm.provision "file", source: "../keys/id_rsa", destination: "~vagrant/moe_id_rsa"
+  config.vm.provision "file", source: "../keys/id_rsa.pub", destination: "~vagrant/moe_id_rsa.pub"
   config.vm.provision "shell", inline: <<-SHELL
-    mkdir -p ~acme/Documents
-    cp /vagrant/files/pyListener.py ~acme/Documents/
-    chown acme:acme ~acme/Documents/pyListener.py
-    chmod 775 ~acme/Documents/pyListener.py
-    cp /vagrant/files/pyListener.py /bin/
-    chmod u+x /bin/pyListener.py
-  SHELL
-
-  # pyListener.service
-  config.vm.provision "shell", inline: <<-SHELL
-    cp /vagrant/files/pyListener.service /etc/systemd/system/
-    systemctl daemon-reload
-    systemctl start pyListener
-    # the following command complains but still works.
-    # combining with a no-operation so vagrant doesn't freak out
-    systemctl enable pyListener 2>/dev/null || :
+    mkdir ~moe/.ssh 
+    cp ~vagrant/moe_id_rsa ~moe/.ssh/id_rsa
+    cp ~vagrant/moe_id_rsa.pub ~moe/.ssh/id_rsa.pub
+    chown -R moe:moe ~moe
+    chmod 600 ~moe/.ssh/id_rsa
   SHELL
 
   # only the acme user should be able to graphically login
   config.vm.provision "shell", path: "./files/acme-login.sh"
-
-  # add custom sudo privileges for user acme
-  config.vm.provision "shell", inline: <<-SHELL
-    echo -e 'acme\tALL=(ALL) NOPASSWD:/usr/sbin/chkrootkit , /usr/bin/find , /usr/bin/netstat , /usr/bin/ss , /usr/bin/cat /etc/shadow' >> /etc/sudoers
-  SHELL
 
   # here come the apt installs, so do an update once
   config.vm.provision "shell", inline: "apt update"
 
   # install standard tools
   config.vm.provision "shell", inline: "apt install -y curl net-tools vim"
-
-  # install chkrootkit
-  config.vm.provision "shell", inline: "apt install -y chkrootkit"
 
   # install samba
   config.vm.provision "shell", inline: "apt install -y smbclient"

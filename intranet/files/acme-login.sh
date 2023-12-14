@@ -11,6 +11,6 @@ echo "[Autologin]" >> /etc/sddm.conf
 echo "Session=Lubuntu" >> /etc/sddm.conf
 echo "" >> /etc/sddm.conf
 echo "[Users]" >> /etc/sddm.conf
-echo "MaximumUid=$(id -u acme)" >> /etc/sddm.conf
-echo "MinimumUid=$(id -u acme)" >> /etc/sddm.conf
+echo "MaximumUid=$(id -u webadmin)" >> /etc/sddm.conf
+echo "MinimumUid=$(id -u webadmin)" >> /etc/sddm.conf
 echo "RememberLastUser=false" >> /etc/sddm.conf

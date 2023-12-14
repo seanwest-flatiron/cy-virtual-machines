@@ -1,0 +1,21 @@
+su triddle
+su triddle
+su triddle
+su triddle
+su triddle
+su triddle
+su triddle
+su triddle
+su triddle
+su triddle
+vim script.sh
+./script.sh
+vim script.sh
+./script.sh
+vim script.sh
+vim script.sh
+./script.sh > answer.txt
+cat answer.txt
+su triddle
+rm script.sh answer.txt
+su triddle

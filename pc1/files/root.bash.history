@@ -1,0 +1,7 @@
+ls -al ~efudd
+ls -al ~admin1
+ls -al ~minervam
+ls -al ~rubeush
+ls -al ~moe
+ls -al ~moe/.ssh
+su moe

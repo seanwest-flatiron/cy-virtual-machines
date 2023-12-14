@@ -21,13 +21,11 @@ Vagrant.configure("2") do |config|
     vb.customize ["modifyvm", :id, "--natpf2" , "guestssh,tcp,,21903,,22"]
   end
 
-  config.vm.hostname = "acmedmz"
+  config.vm.hostname = "intranet"
 
   #these look a little wonky but just copying for now
   config.vm.provision "shell", inline: <<-SHELL
-    echo '192.168.20.100  intranet.acmecompany.fis' >> /etc/hosts
-    echo '192.168.20.100  acmedmz' >> /etc/hosts
-    echo '192.168.20.100  acmedmz.acmecompany.fis' >> /etc/hosts
+    echo '192.168.20.100  intranet.acme.local' >> /etc/hosts
   SHELL
 
   # Create ip addresses
@@ -36,30 +34,34 @@ Vagrant.configure("2") do |config|
   # Create users
   config.vm.provision "shell", path: "./files/create-users.sh"
 
-  # Bleachbit in root's .bash_history
+  # Set up Moe's ssh keys, reuse our shared key
+  config.vm.provision "file", source: "../keys/id_rsa.pub", destination: "~vagrant/moe_authorized_keys"
   config.vm.provision "shell", inline: <<-SHELL
-    echo bleachbit > /root/.bash_history
+    mkdir ~moe/.ssh 
+    cp ~vagrant/moe_authorized_keys ~moe/.ssh/authorized_keys
+    chown -R moe:moe ~moe
   SHELL
 
-  # not sure the point of pyListener being at Downloads/system
-  # pyListener.py
   config.vm.provision "shell", inline: <<-SHELL
-    cp /vagrant/files/pyListener.py ~acme/Downloads/system
-    chown acme:acme ~acme/Downloads/system
-    chmod 775 ~acme/Downloads/system
-    cp /vagrant/files/pyListener.py /bin/
-    chown root:root /bin/pyListener.py
-    chmod 744 /bin/pyListener.py
+    cp /vagrant/files/upload.py /usr/bin/upload.py
+    chown root:root /usr/bin/upload.py
+    chmod 755 /usr/bin/upload.py
   SHELL
 
-  # pyListener.service
   config.vm.provision "shell", inline: <<-SHELL
-    cp /vagrant/files/pyListener.service /etc/systemd/system/
-    systemctl daemon-reload
-    systemctl start pyListener
-    # the following command complains but still works.
-    # combining with a no-operation so vagrant doesn't freak out
-    systemctl enable pyListener 2>/dev/null || :
+    echo "0 2 * * * /usr/bin/python3 /usr/bin/upload.py" | crontab -u root -
+  SHELL
+
+  # moe's .bash_history
+  config.vm.provision "shell", inline: <<-SHELL
+    echo "sudo find /var/www/html | less" >> ~moe/.bash_history
+    echo "vim upload.py" >> ~moe/.bash_history
+    echo "./upload.py" >> ~moe/.bash_history
+    echo "vim upload.py" >> ~moe/.bash_history
+    echo "./upload.py" >> ~moe/.bash_history
+    echo "sudo mv upload.py /usr/bin/" >> ~moe/.bash_history
+    echo "sudo crontab -e" >> ~moe/.bash_history
+    chown moe:moe ~moe/.bash_history
   SHELL
 
   # here come the apt installs, so do an update once
@@ -73,11 +75,7 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: <<-SHELL
     rm -rf /var/www/html
     tar -xzf /vagrant/files/html.tgz -C /var/www/
-    cp /var/www/html/dev/designs/anvil2k.jpg ~acme/Documents/
-    cp /var/www/html/wordpress/wp-content/uploads/2022/10/sparksAnvil.jpeg ~acme/Pictures/
-    chown acme:acme ~acme/Documents/anvil2k.jpg ~acme/Pictures/sparksAnvil.jpeg
     mysql < /vagrant/files/db.sql
-    sed -i 's/^Listen 80$/Listen 192.168.20.100:80/' /etc/apache2/ports.conf
     systemctl restart mariadb
     systemctl restart apache2
   SHELL
