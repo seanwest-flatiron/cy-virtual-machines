@@ -7,4 +7,4 @@ rm -rf /root/.ssh
 rm /etc/sudoers.d/vagrant
 deluser vagrant
 rm -rf /home/vagrant
-
+rm -rf /vagrant
