@@ -17,6 +17,8 @@ Vagrant.configure("2") do |config|
     # set the network adapters
     # vagrant needs one of them to be nat with port forwarding
     vb.customize ["modifyvm", :id, "--nic1", "intnet", "--intnet1", "intnet-2"]
+    vb.customize ["modifyvm", :id, "--nic1", "intnet", "--intnet1", "intnet-2", "--macaddress1", "080027026A00"]
+
     vb.customize ["modifyvm", :id, "--nic2", "nat"]
     vb.customize ["modifyvm", :id, "--natpf2" , "guestssh,tcp,,21903,,22"]
   end
