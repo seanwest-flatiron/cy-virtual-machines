@@ -20,6 +20,7 @@ sleep 5
 
 VBoxManage modifyvm pc2 --nic2 null
 VBoxManage modifyvm pc2 --nic2 none
+VBoxManage sharedfolder remove "pc2" --name "vagrant"
 
 echo "Exporting to .ova. This may take a while."
 VBoxManage export pc2 --output "../ovas/pc2.ova"

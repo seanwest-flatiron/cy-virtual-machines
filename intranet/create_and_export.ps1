@@ -20,6 +20,7 @@ sleep 5
 
 VBoxManage modifyvm intranet --nic2 null
 VBoxManage modifyvm intranet --nic2 none
+VBoxManage sharedfolder remove "intranet" --name "vagrant"
 
 echo "Exporting to .ova. This may take a while."
 VBoxManage export intranet --output "../ovas/intranet.ova"
