@@ -1,7 +1,7 @@
 #!/bin/bash
 
 sudo useradd -m webadmin -s /bin/bash
-echo 'webadmin:paris^cheetos^puppy' | sudo chpasswd
+echo 'webadmin:Acme@20anvil' | sudo chpasswd
 sudo usermod -aG sudo,adm,cdrom,lpadmin webadmin
 sudo mkdir ~webadmin/{Documents,Downloads,Desktop,Pictures,Videos}
 sudo chown webadmin:webadmin ~webadmin
