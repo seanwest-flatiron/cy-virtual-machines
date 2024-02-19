@@ -3,7 +3,8 @@
 
 Vagrant.configure("2") do |config|
 
-  config.vm.box = "vyos/current"
+  config.vm.box = "vyos/equuleus"
+  config.vm.box_version = "1.3.0"
 
   # virtualbox specifics
   config.vm.provider "virtualbox" do |vb|
@@ -13,13 +14,6 @@ Vagrant.configure("2") do |config|
 
     # Put it in a VirtualBox group
     vb.customize ["modifyvm", :id, "--groups", "/Capstone"]
-
-    # Modify the default NAT network's MAC address
-    vb.customize ["modifyvm", :id, "--macaddress1", "080027A0C5B0"]
-
-    # Disable automatic installation of VirtualBox Guest Additions
-    vb.check_guest_additions = false
-    vb.functional_vboxsf = false
   end
 
   # SSH settings
@@ -32,22 +26,22 @@ Vagrant.configure("2") do |config|
 
   # Internal networks
   config.vm.network "private_network", virtualbox__intnet: "intnet-1",
-    mac: "0800279CC315", ip: "192.168.10.1", auto_config: false
+    ip: "192.168.10.1"
   config.vm.network "private_network", virtualbox__intnet: "intnet-2",
-    mac: "08002776FE1D", ip: "192.168.20.1", auto_config: false
+    ip: "192.168.20.1"
   config.vm.network "private_network", virtualbox__intnet: "intnet-3",
-    mac: "0800274EED34", ip: "192.168.30.1", auto_config: false
+    ip: "192.168.30.1"
 
   # Load prebaked vyos settings
-  config.vm.provision "file", source: "./files/settings.conf", destination: "~/settings.conf"
+  config.vm.provision "file", source: "./files/config.sh", destination: "/home/vyos/config.sh"
   config.vm.provision "shell", inline: <<-SHELL
     #!/bin/vbash
     source /opt/vyatta/etc/functions/script-template
     configure
-    load ~vyos/settings.conf
+    . /home/vyos/config.sh
     commit
     save
     exit
-    rm ~vyos/settings.conf
+    rm /home/vyos/config.sh
   SHELL
 end
