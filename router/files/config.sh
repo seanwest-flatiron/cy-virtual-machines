@@ -34,3 +34,8 @@ set service dhcp-server shared-network-name internal30 subnet 192.168.30.0/24 ra
 set service ssh listen-address 192.168.10.1
 set service ssh listen-address 192.168.20.1
 set service ssh listen-address 192.168.30.1
+
+del interfaces ethernet eth0 hw-id
+del interfaces ethernet eth1 hw-id
+del interfaces ethernet eth2 hw-id
+del interfaces ethernet eth3 hw-id
