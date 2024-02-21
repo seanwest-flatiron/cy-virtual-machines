@@ -43,5 +43,6 @@ Vagrant.configure("2") do |config|
     save
     exit
     rm /home/vyos/config.sh
+    sudo shutdown now
   SHELL
 end

@@ -1,8 +1,9 @@
 vagrant plugin install vagrant-vyos
 vagrant destroy -f
 vagrant up
-sleep 5
+sleep 20
 vagrant halt
+sleep 20
 
 # Remove the port forwarding rules Vagrant added
 VBoxManage modifyvm "router" --natpf1 delete "ssh"

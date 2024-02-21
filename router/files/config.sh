@@ -12,24 +12,26 @@ set nat source rule 102 translation address masquerade
 
 set service dhcp-server shared-network-name internal10 subnet 192.168.10.0/24 default-router 192.168.10.1
 set service dhcp-server shared-network-name internal10 subnet 192.168.10.0/24 lease 86400
-set service dhcp-server shared-network-name internal10 subnet 192.168.10.0/24 dns-server 1.1.1.1
-set service dhcp-server shared-network-name internal10 subnet 192.168.10.0/24 dns-server 8.8.8.8
+set service dhcp-server shared-network-name internal10 subnet 192.168.10.0/24 dns-server 192.168.10.1
 set service dhcp-server shared-network-name internal10 subnet 192.168.10.0/24 range 0 start 192.168.10.200
 set service dhcp-server shared-network-name internal10 subnet 192.168.10.0/24 range 0 stop 192.168.10.250
 
 set service dhcp-server shared-network-name internal20 subnet 192.168.20.0/24 default-router 192.168.20.1
 set service dhcp-server shared-network-name internal20 subnet 192.168.20.0/24 lease 86400
-set service dhcp-server shared-network-name internal20 subnet 192.168.20.0/24 dns-server 1.1.1.1
-set service dhcp-server shared-network-name internal20 subnet 192.168.20.0/24 dns-server 8.8.8.8
+set service dhcp-server shared-network-name internal20 subnet 192.168.20.0/24 dns-server 192.168.20.1
 set service dhcp-server shared-network-name internal20 subnet 192.168.20.0/24 range 0 start 192.168.20.200
 set service dhcp-server shared-network-name internal20 subnet 192.168.20.0/24 range 0 stop 192.168.20.250
 
 set service dhcp-server shared-network-name internal30 subnet 192.168.30.0/24 default-router 192.168.30.1
 set service dhcp-server shared-network-name internal30 subnet 192.168.30.0/24 lease 86400
-set service dhcp-server shared-network-name internal30 subnet 192.168.30.0/24 dns-server 1.1.1.1
-set service dhcp-server shared-network-name internal30 subnet 192.168.30.0/24 dns-server 8.8.8.8
+set service dhcp-server shared-network-name internal30 subnet 192.168.30.0/24 dns-server 192.168.30.1
 set service dhcp-server shared-network-name internal30 subnet 192.168.30.0/24 range 0 start 192.168.30.200
 set service dhcp-server shared-network-name internal30 subnet 192.168.30.0/24 range 0 stop 192.168.30.250
+
+set service dns forwarding allow-from 192.168.0.0/16
+set service dns forwarding listen-address 192.168.10.1
+set service dns forwarding listen-address 192.168.20.1
+set service dns forwarding listen-address 192.168.30.1
 
 set service ssh listen-address 192.168.10.1
 set service ssh listen-address 192.168.20.1
