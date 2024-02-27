@@ -13,7 +13,7 @@ This means that:
 ## Canvas VM Changes
 The main branch contains changes that may require modifications to the existing Canvas course. Those changes are currently being used on Live cohorts.
 
-A replica of the original was created initially when building this all out. That has it's own branch here: https://github.com/seanwest-flatiron/cse-capstone/tree/original and can be access from the command line with `git checkout original`.
+A replica of the original was created initially when building this all out. That has it's own branch here: https://github.com/seanwest-flatiron/virtual-machines/tree/original and can be access from the command line with `git checkout original`.
 
 ## Requirements
  - Upgrade VirtualBox to the latest version
