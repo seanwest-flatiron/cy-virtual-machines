@@ -1,0 +1,37 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+
+  config.vm.box = "kalilinux/rolling"
+  config.vm.box_version = "2023.4.0"
+
+  # virtualbox specifics
+  config.vm.provider "virtualbox" do |vb|
+    vb.name = "kali"
+    vb.cpus = 2
+    vb.memory = "2048"
+    vb.gui = false
+
+    vb.customize ["modifyvm", :id, "--natpf1" , "guestssh,tcp,,22002,,22"]
+  end
+
+  config.vm.hostname = "kali"
+
+  # Create student user
+  config.vm.provision "shell", inline: <<-SHELL
+    sudo useradd -m student -s /bin/bash
+    echo 'student:password' | chpasswd
+    sudo usermod -aG sudo student
+  SHELL
+
+  # upload teardown script to be run outside of Vagrant
+  config.vm.provision "file", source: "./files/teardown.sh", destination: "~/teardown.sh"
+
+  # Allow temporary root ssh access so teardown script can remove vagrant user
+  config.vm.provision "file", source: "../keys/id_rsa.pub", destination: "~/id_rsa.pub"
+  config.vm.provision "shell", inline: <<-SHELL
+    mkdir -p /root/.ssh
+    cp ~vagrant/id_rsa.pub /root/.ssh/authorized_keys
+  SHELL
+end
