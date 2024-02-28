@@ -22,8 +22,8 @@ A replica of the original was created initially when building this all out. That
 ## Installation
 
 ```
-git clone git@github.com:seanwest-flatiron/cse-capstone.git
-cd cse-capstone
+git clone git@github.com:seanwest-flatiron/virtual-machines.git
+cd virtual-machines
 ```
 
 Now add into the `boxes` directory the `lubuntu-desktop-22.04-v2.box`` file from here: https://drive.google.com/drive/folders/12oq-RQBwUPyk75iS9C8c3pCHHlEiEAr9?usp=share_link
