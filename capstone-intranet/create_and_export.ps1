@@ -1,6 +1,6 @@
 vagrant destroy -f
 vagrant up
-vagrant ssh -c 'sudo apt update && sudo apt upgrade -y'
+vagrant ssh -c 'sudo apt update -yq && sudo DEBIAN_FRONTEND=noninteractive apt upgrade -yq'
 vagrant halt
 
 VBoxManage startvm intranet --type headless

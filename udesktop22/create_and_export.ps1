@@ -1,7 +1,6 @@
 vagrant destroy -f
 vagrant up
-#currently this may still bring up an interactive screen so it's commented out
-#vagrant ssh -c 'apt-get update -yq && DEBIAN_FRONTEND=noninteractive apt-get upgrade -yq'
+vagrant ssh -c 'sudo apt update -yq && sudo DEBIAN_FRONTEND=noninteractive apt upgrade -yq'
 vagrant halt
 
 VBoxManage sharedfolder remove "udesktop22" --name "vagrant"

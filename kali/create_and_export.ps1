@@ -1,7 +1,6 @@
 vagrant destroy -f
 vagrant up
-#temporarily disable because a package requires user input and this command does not suppress it
-#vagrant ssh -c 'sudo apt-get update -yq && DEBIAN_FRONTEND=noninteractive sudo apt-get upgrade -yq'
+vagrant ssh -c 'sudo apt update -yq && sudo DEBIAN_FRONTEND=noninteractive apt upgrade -yq'
 vagrant halt
 
 VBoxManage sharedfolder remove "kali" --name "vagrant"
