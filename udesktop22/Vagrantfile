@@ -3,7 +3,8 @@
 
 Vagrant.configure("2") do |config|
 
-  config.vm.box = "ubuntu/jammy64"
+  config.vm.box = "udesktop22"
+  config.vm.box_url = "../boxes/udesktop22.box"
 
   # virtualbox specifics
   config.vm.provider "virtualbox" do |vb|
@@ -34,6 +35,11 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: <<-SHELL
     echo 'APT::Periodic::Update-Package-Lists "0";' > /etc/apt/apt.conf.d/20auto-upgrades
     echo 'APT::Periodic::Unattended-Upgrade "0";' >> /etc/apt/apt.conf.d/20auto-upgrades
+  SHELL
+
+  # remove wayland which causes issues if you start headless and then click on show
+  config.vm.provision "shell", inline: <<-SHELL
+    sudo sed -i 's/#WaylandEnable=false/WaylandEnable=false/g' /etc/gdm3/custom.conf
   SHELL
 
   # remove file that is preventing ssh password authentication
