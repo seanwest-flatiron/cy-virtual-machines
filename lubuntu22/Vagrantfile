@@ -1,0 +1,52 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+
+  config.vm.box = "lubuntu22"
+  config.vm.box_url = "../boxes/lubuntu22.box"
+
+  # virtualbox specifics
+  config.vm.provider "virtualbox" do |vb|
+    vb.name = "lubuntu22"
+    vb.cpus = 2
+    vb.memory = "2048"
+
+    # set the network adapters
+    vb.customize ["modifyvm", :id, "--natpf1" , "guestssh,tcp,,22004,,22"]
+  end
+
+  config.vm.hostname = "lubuntu22"
+
+  # Create student user
+  config.vm.provision "shell", inline: <<-SHELL
+    sudo useradd -m student -s /bin/bash
+    echo 'student:password' | chpasswd
+    sudo usermod -aG sudo student
+  SHELL
+
+  # here come the apt installs, so do an update once
+  config.vm.provision "shell", inline: "apt update"
+
+  # install standard tools
+  config.vm.provision "shell", inline: "apt install -y curl net-tools vim"
+
+  # turn off annoying background upgrades which can prevent student from apt installing
+  config.vm.provision "shell", inline: <<-SHELL
+    echo 'APT::Periodic::Update-Package-Lists "0";' > /etc/apt/apt.conf.d/20auto-upgrades
+    echo 'APT::Periodic::Unattended-Upgrade "0";' >> /etc/apt/apt.conf.d/20auto-upgrades
+  SHELL
+
+  # remove file that is preventing ssh password authentication
+  #config.vm.provision "shell", inline: "rm /etc/ssh/sshd_config.d/60-cloudimg-settings.conf"
+
+  # upload teardown script to be run outside of Vagrant
+  config.vm.provision "file", source: "./files/teardown.sh", destination: "~/teardown.sh"
+
+  # Allow temporary root ssh access so teardown script can remove vagrant user
+  config.vm.provision "file", source: "../keys/id_rsa.pub", destination: "~/id_rsa.pub"
+  config.vm.provision "shell", inline: <<-SHELL
+    mkdir -p /root/.ssh
+    cp ~vagrant/id_rsa.pub /root/.ssh/authorized_keys
+  SHELL
+end
